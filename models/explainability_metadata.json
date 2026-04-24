@@ -1,0 +1,7 @@
+{
+  "healthy_engine_id": 73,
+  "degrading_engine_id": 19,
+  "near_failure_engine_id": 34,
+  "top_global_feature": "sensor_11_roll_mean_5",
+  "summary_plot": "plots/shap_summary_bar.png"
+}

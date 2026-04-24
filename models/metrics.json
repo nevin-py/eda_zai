@@ -1,0 +1,60 @@
+{
+  "dataset": {
+    "subset": "FD001",
+    "train_rows": 20631,
+    "test_rows": 13096,
+    "engine_count_train": 100,
+    "engine_count_test": 100
+  },
+  "regression": {
+    "baseline_linear_regression": {
+      "rmse": 19.266236459792893,
+      "mae": 14.257170823425634,
+      "r2": 0.5119882355716325
+    },
+    "xgboost": {
+      "rmse": 16.642275474820934,
+      "mae": 11.681806409584725,
+      "r2": 0.6358654128240726
+    },
+    "best_params": {
+      "subsample": 1.0,
+      "reg_lambda": 5.0,
+      "n_estimators": 700,
+      "min_child_weight": 1,
+      "max_depth": 4,
+      "learning_rate": 0.01,
+      "colsample_bytree": 0.8
+    }
+  },
+  "classification": {
+    "xgboost": {
+      "precision": 0.7029411764705882,
+      "recall": 0.7198795180722891,
+      "f1": 0.7113095238095238,
+      "accuracy": 0.9851863164324984,
+      "roc_auc": 0.9888464072523249
+    },
+    "best_params": {
+      "subsample": 0.7,
+      "scale_pos_weight": 3.0,
+      "n_estimators": 350,
+      "min_child_weight": 3,
+      "max_depth": 3,
+      "learning_rate": 0.03,
+      "colsample_bytree": 0.7
+    },
+    "threshold": 0.5,
+    "failure_within_cycles": 30,
+    "confusion_matrix": [
+      [
+        12663,
+        101
+      ],
+      [
+        93,
+        239
+      ]
+    ]
+  }
+}
