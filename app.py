@@ -42,86 +42,240 @@ PLOTLY_CONFIG = {
     "modeBarButtonsToRemove": ["lasso2d", "select2d", "autoScale2d"],
 }
 
+# ── Dark-mode palette ──────────────────────────────────────────────
+DARK_BG = "#0a0e17"
+CARD_BG = "rgba(15, 23, 42, 0.72)"
+PLOT_BG = "rgba(15, 23, 42, 0.55)"
+GRID_CLR = "rgba(100, 180, 255, 0.07)"
+TEXT_CLR = "#c8d6e5"
+ACCENT_CYAN = "#00e5ff"
+ACCENT_AMBER = "#ffab00"
+ACCENT_RED = "#ff1744"
+ACCENT_GREEN = "#00e676"
+RISK_COLORS = {"High": "#ff1744", "Medium": "#ffab00", "Low": "#00e676"}
+
+
+def _dark_layout(**overrides) -> dict:
+    """Return a reusable dark Plotly layout dict."""
+    base = {
+        "paper_bgcolor": "rgba(0,0,0,0)",
+        "plot_bgcolor": PLOT_BG,
+        "font": {"color": TEXT_CLR, "family": "Inter, sans-serif", "size": 13},
+        "title_font": {"color": "#ffffff", "size": 16, "family": "Inter, sans-serif"},
+        "legend": {"bgcolor": "rgba(0,0,0,0)", "font": {"color": TEXT_CLR}},
+        "margin": {"l": 24, "r": 24, "t": 56, "b": 24},
+    }
+    base.update(overrides)
+    return base
+
+
+def _dark_axes(fig, rangeslider: bool = False) -> None:
+    """Apply dark grid styling to both axes."""
+    fig.update_xaxes(
+        gridcolor=GRID_CLR,
+        zerolinecolor=GRID_CLR,
+        tickfont={"color": TEXT_CLR},
+        title_font={"color": TEXT_CLR},
+        rangeslider_visible=rangeslider,
+    )
+    fig.update_yaxes(
+        gridcolor=GRID_CLR,
+        zerolinecolor=GRID_CLR,
+        tickfont={"color": TEXT_CLR},
+        title_font={"color": TEXT_CLR},
+    )
+
 
 def apply_custom_theme() -> None:
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
         :root {
-            --ink: #102a43;
-            --muted: #486581;
-            --surface: rgba(255, 255, 255, 0.78);
-            --border: #d5e2ea;
-            --high: #d9480f;
-            --med: #f08c00;
-            --low: #2b8a3e;
-            --teal: #0b7285;
+            --bg-primary:   #0a0e17;
+            --bg-card:      rgba(15, 23, 42, 0.72);
+            --bg-card-hover:rgba(20, 30, 55, 0.85);
+            --border:       rgba(100, 180, 255, 0.10);
+            --border-glow:  rgba(0, 229, 255, 0.25);
+            --text-primary: #e2e8f0;
+            --text-muted:   #94a3b8;
+            --accent-cyan:  #00e5ff;
+            --accent-amber: #ffab00;
+            --accent-red:   #ff1744;
+            --accent-green: #00e676;
+        }
+
+        html, body, .stApp {
+            background: var(--bg-primary) !important;
+            color: var(--text-primary);
+            font-family: "Inter", -apple-system, sans-serif;
         }
 
         .stApp {
             background:
-                radial-gradient(circle at 9% 5%, rgba(11, 114, 133, 0.10), transparent 22%),
-                radial-gradient(circle at 92% 16%, rgba(240, 140, 0, 0.09), transparent 25%),
-                linear-gradient(160deg, #f4f7f5 0%, #eef3f8 45%, #f7f3ec 100%);
-            color: var(--ink);
-            font-family: "Source Sans 3", sans-serif;
+                radial-gradient(ellipse at 12% 8%,  rgba(0,229,255,0.06), transparent 40%),
+                radial-gradient(ellipse at 85% 20%, rgba(255,171,0,0.04), transparent 35%),
+                radial-gradient(ellipse at 50% 90%, rgba(0,230,118,0.03), transparent 40%),
+                var(--bg-primary) !important;
         }
 
         .main .block-container {
-            max-width: 1320px;
-            padding-top: 1.2rem;
-            padding-bottom: 1.4rem;
+            max-width: 1380px;
+            padding: 1.2rem 1.6rem 1.6rem;
         }
 
-        h1, h2, h3 {
-            font-family: "Space Grotesk", sans-serif;
+        /* ── Typography ─────────────────────────────── */
+        h1 {
+            font-family: "Inter", sans-serif !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        h2, h3 {
+            font-family: "Inter", sans-serif !important;
+            font-weight: 700 !important;
             letter-spacing: -0.02em;
-            color: var(--ink);
+            color: #ffffff !important;
+        }
+        h4 {
+            font-family: "Inter", sans-serif !important;
+            color: var(--text-primary) !important;
+        }
+        p, span, label, .stMarkdown, .stText, div {
+            font-family: "Inter", sans-serif;
         }
 
-        p, label, .stMarkdown, .stText {
-            font-family: "Source Sans 3", sans-serif;
+        /* ── Sidebar ────────────────────────────────── */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #0d1321 0%, #101829 100%) !important;
+            border-right: 1px solid var(--border) !important;
+        }
+        section[data-testid="stSidebar"] .stMarkdown h3 {
+            color: var(--accent-cyan) !important;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+        section[data-testid="stSidebar"] .stRadio label {
+            color: var(--text-muted) !important;
+            transition: color 0.2s;
+        }
+        section[data-testid="stSidebar"] .stRadio label:hover {
+            color: var(--accent-cyan) !important;
         }
 
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, rgba(238, 243, 248, 0.9) 0%, rgba(247, 243, 236, 0.92) 100%);
-            border-right: 1px solid var(--border);
-        }
-
+        /* ── Metric Cards ───────────────────────────── */
         [data-testid="stMetric"] {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(16, 42, 67, 0.06);
-            padding: 0.6rem 0.9rem;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 14px;
+            padding: 0.75rem 1rem;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        [data-testid="stMetric"]:hover {
+            border-color: var(--border-glow) !important;
+            box-shadow: 0 4px 32px rgba(0,229,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+        }
+        [data-testid="stMetric"] label {
+            color: var(--text-muted) !important;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        [data-testid="stMetric"] [data-testid="stMetricValue"] {
+            color: #ffffff !important;
+            font-family: "JetBrains Mono", monospace !important;
+            font-weight: 600;
         }
 
+        /* ── DataFrame ──────────────────────────────── */
         [data-testid="stDataFrame"] {
-            background: rgba(255, 255, 255, 0.68);
-            border: 1px solid var(--border);
-            border-radius: 14px;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 12px;
             overflow: hidden;
         }
 
+        /* ── Tabs ───────────────────────────────────── */
+        .stTabs [data-baseweb="tab-list"] {
+            background: transparent;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .stTabs [data-baseweb="tab"]:hover {
+            color: var(--accent-cyan) !important;
+        }
+        .stTabs [aria-selected="true"] {
+            color: var(--accent-cyan) !important;
+            border-bottom-color: var(--accent-cyan) !important;
+        }
+
+        /* ── Container borders ──────────────────────── */
+        [data-testid="stVerticalBlock"] > div[data-testid="stExpander"],
+        div[data-testid="stContainer"] {
+            border-color: var(--border) !important;
+        }
+
+        /* ── Buttons ────────────────────────────────── */
+        .stDownloadButton button {
+            background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(0,229,255,0.04)) !important;
+            border: 1px solid rgba(0,229,255,0.3) !important;
+            color: var(--accent-cyan) !important;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.25s;
+        }
+        .stDownloadButton button:hover {
+            background: linear-gradient(135deg, rgba(0,229,255,0.22), rgba(0,229,255,0.08)) !important;
+            box-shadow: 0 0 20px rgba(0,229,255,0.12);
+        }
+
+        /* ── Slider / select ────────────────────────── */
+        .stSlider label, .stMultiSelect label, .stSelectbox label {
+            color: var(--text-muted) !important;
+        }
+
+        /* ── Banner ─────────────────────────────────── */
         .pm-banner {
             border: 1px solid var(--border);
-            border-left: 6px solid var(--teal);
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.75);
-            box-shadow: 0 8px 24px rgba(16, 42, 67, 0.05);
-            padding: 0.8rem 1rem;
-            margin-bottom: 0.9rem;
-            color: var(--muted);
-            font-size: 0.98rem;
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 12px;
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            font-size: 0.94rem;
+            line-height: 1.5;
         }
 
         .pm-caption {
-            color: var(--muted);
+            color: var(--text-muted);
             font-size: 0.92rem;
             margin-top: -0.3rem;
+            letter-spacing: 0.02em;
         }
+
+        /* ── Scrollbar ──────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100,180,255,0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100,180,255,0.25); }
         </style>
         """,
         unsafe_allow_html=True,
@@ -216,11 +370,19 @@ def render_shap_waterfall(explainer, feature_row: pd.Series, feature_cols: list[
         feature_names=feature_cols,
     )
 
-    plt.figure(figsize=(9, 5.5))
-    shap.plots.waterfall(explanation, max_display=12, show=False)
-    fig = plt.gcf()
-    st.pyplot(fig, clear_figure=True)
-    plt.close(fig)
+    with plt.rc_context({
+        "figure.facecolor": DARK_BG,
+        "axes.facecolor": DARK_BG,
+        "text.color": TEXT_CLR,
+        "axes.labelcolor": TEXT_CLR,
+        "xtick.color": TEXT_CLR,
+        "ytick.color": TEXT_CLR,
+    }):
+        plt.figure(figsize=(9, 5.5))
+        shap.plots.waterfall(explanation, max_display=12, show=False)
+        fig = plt.gcf()
+        st.pyplot(fig, clear_figure=True)
+        plt.close(fig)
 
 
 def page_fleet(latest_fleet: pd.DataFrame) -> None:
@@ -284,7 +446,7 @@ def page_fleet(latest_fleet: pd.DataFrame) -> None:
         y="predicted_rul",
         color="risk_level",
         size="failure_prob_30",
-        size_max=26,
+        size_max=28,
         custom_data=[ENGINE_ID_COL, "failure_prob_30"],
         hover_data={
             ENGINE_ID_COL: True,
@@ -292,8 +454,8 @@ def page_fleet(latest_fleet: pd.DataFrame) -> None:
             "predicted_rul": ":.1f",
             "failure_prob_30": ":.1%",
         },
-        color_discrete_map={"High": "#D7191C", "Medium": "#FDAE61", "Low": "#1A9641"},
-        title="Fleet Risk Map: Cycle vs Predicted RUL",
+        color_discrete_map=RISK_COLORS,
+        title="Fleet Risk Map — Cycle vs Predicted RUL",
         labels={
             CYCLE_COL: "Current Cycle",
             "predicted_rul": "Predicted RUL",
@@ -301,26 +463,23 @@ def page_fleet(latest_fleet: pd.DataFrame) -> None:
             "failure_prob_30": "Failure Probability (30 cycles)",
             ENGINE_ID_COL: "Engine ID",
         },
-        template="plotly_white",
+        template="plotly_dark",
     )
     scatter_fig.update_traces(
-        marker={"line": {"width": 1, "color": "white"}, "opacity": 0.88},
+        marker={"line": {"width": 0.8, "color": "rgba(0,0,0,0.4)"}, "opacity": 0.92},
         hovertemplate=(
-            "Engine %{customdata[0]}<br>"
+            "<b>Engine %{customdata[0]}</b><br>"
             "Cycle %{x}<br>"
             "Predicted RUL %{y:.1f}<br>"
             "Failure Prob %{customdata[1]:.1%}<extra></extra>"
         ),
     )
-    scatter_fig.update_xaxes(rangeslider_visible=True, gridcolor="rgba(16, 42, 67, 0.11)")
-    scatter_fig.update_yaxes(gridcolor="rgba(16, 42, 67, 0.11)")
-    scatter_fig.update_layout(
-        height=470,
+    scatter_fig.update_layout(**_dark_layout(
+        height=480,
         legend_title_text="Risk Level",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(255,255,255,0.65)",
-        margin={"l": 20, "r": 20, "t": 55, "b": 20},
-    )
+        legend_title_font={"color": TEXT_CLR},
+    ))
+    _dark_axes(scatter_fig, rangeslider=True)
 
     risk_counts = (
         filtered_fleet["risk_level"]
@@ -336,21 +495,22 @@ def page_fleet(latest_fleet: pd.DataFrame) -> None:
         y="risk_level",
         orientation="h",
         color="risk_level",
-        color_discrete_map={"High": "#D7191C", "Medium": "#FDAE61", "Low": "#1A9641"},
+        color_discrete_map=RISK_COLORS,
         title="Risk Distribution",
         text="count",
-        template="plotly_white",
+        template="plotly_dark",
     )
-    risk_fig.update_layout(
+    risk_fig.update_layout(**_dark_layout(
         showlegend=False,
-        height=470,
+        height=480,
         xaxis_title="Engine Count",
         yaxis_title="",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(255,255,255,0.65)",
-        margin={"l": 0, "r": 10, "t": 55, "b": 20},
+    ))
+    risk_fig.update_traces(
+        textposition="outside", cliponaxis=False,
+        textfont={"color": TEXT_CLR},
     )
-    risk_fig.update_traces(textposition="outside", cliponaxis=False)
+    _dark_axes(risk_fig)
 
     chart_col1, chart_col2 = st.columns([2, 1])
     with chart_col1:
@@ -448,43 +608,47 @@ def page_engine(
         go.Indicator(
             mode="gauge+number",
             value=float(latest_row["predicted_rul"]),
-            number={"suffix": " cycles"},
-            title={"text": "Predicted RUL"},
+            number={"suffix": " cycles", "font": {"color": "#ffffff", "family": "JetBrains Mono"}},
+            title={"text": "Predicted RUL", "font": {"color": TEXT_CLR}},
             gauge={
-                "axis": {"range": [0, float(rul_cap)]},
-                "bar": {"color": "#2C7FB8"},
+                "axis": {"range": [0, float(rul_cap)], "tickcolor": TEXT_CLR, "tickfont": {"color": TEXT_CLR}},
+                "bar": {"color": ACCENT_CYAN},
+                "bgcolor": "rgba(15,23,42,0.4)",
+                "borderwidth": 0,
                 "steps": [
-                    {"range": [0, 30], "color": "rgba(215, 25, 28, 0.25)"},
-                    {"range": [30, 70], "color": "rgba(253, 174, 97, 0.25)"},
-                    {"range": [70, float(rul_cap)], "color": "rgba(26, 150, 65, 0.20)"},
+                    {"range": [0, 30], "color": "rgba(255, 23, 68, 0.18)"},
+                    {"range": [30, 70], "color": "rgba(255, 171, 0, 0.15)"},
+                    {"range": [70, float(rul_cap)], "color": "rgba(0, 230, 118, 0.12)"},
                 ],
             },
         )
     )
-    rul_gauge.update_layout(height=300, margin={"l": 20, "r": 20, "t": 55, "b": 20})
+    rul_gauge.update_layout(**_dark_layout(height=300))
 
     failure_gauge = go.Figure(
         go.Indicator(
             mode="gauge+number",
             value=failure_probability,
-            number={"valueformat": ".1%"},
-            title={"text": f"Failure Risk in {failure_threshold} Cycles ({failure_label})"},
+            number={"valueformat": ".1%", "font": {"color": "#ffffff", "family": "JetBrains Mono"}},
+            title={"text": f"Failure Risk — {failure_threshold} Cycles ({failure_label})", "font": {"color": TEXT_CLR}},
             gauge={
-                "axis": {"range": [0, 1]},
-                "bar": {"color": "#D7301F"},
+                "axis": {"range": [0, 1], "tickcolor": TEXT_CLR, "tickfont": {"color": TEXT_CLR}},
+                "bar": {"color": ACCENT_RED},
+                "bgcolor": "rgba(15,23,42,0.4)",
+                "borderwidth": 0,
                 "steps": [
-                    {"range": [0, 0.5], "color": "rgba(26, 150, 65, 0.20)"},
-                    {"range": [0.5, 1], "color": "rgba(215, 25, 28, 0.20)"},
+                    {"range": [0, 0.5], "color": "rgba(0, 230, 118, 0.12)"},
+                    {"range": [0.5, 1], "color": "rgba(255, 23, 68, 0.15)"},
                 ],
                 "threshold": {
-                    "line": {"color": "#8B0000", "width": 3},
+                    "line": {"color": ACCENT_AMBER, "width": 3},
                     "thickness": 0.75,
                     "value": 0.5,
                 },
             },
         )
     )
-    failure_gauge.update_layout(height=300, margin={"l": 20, "r": 20, "t": 55, "b": 20})
+    failure_gauge.update_layout(**_dark_layout(height=300))
 
     gauge_col1, gauge_col2 = st.columns(2)
     with gauge_col1:
@@ -492,7 +656,7 @@ def page_engine(
     with gauge_col2:
         st.plotly_chart(failure_gauge, use_container_width=True, config=PLOTLY_CONFIG)
 
-    tab_sensors, tab_rul, tab_explain = st.tabs(["Sensor Behavior", "RUL Tracking", "Explainability"])
+    tab_sensors, tab_rul, tab_explain = st.tabs(["⚡ Sensor Behavior", "📉 RUL Tracking", "🔍 Explainability"])
 
     with tab_sensors:
         chart_df = engine_history[[CYCLE_COL, *selected_sensors]].melt(
@@ -503,17 +667,12 @@ def page_engine(
             x=CYCLE_COL,
             y="value",
             color="sensor",
-            title=f"Sensor Trends for Engine {selected_engine}",
-            template="plotly_white",
+            title=f"Sensor Trends — Engine {selected_engine}",
+            template="plotly_dark",
         )
-        sensor_fig.update_xaxes(rangeslider_visible=True, gridcolor="rgba(16, 42, 67, 0.11)")
-        sensor_fig.update_yaxes(gridcolor="rgba(16, 42, 67, 0.11)")
-        sensor_fig.update_layout(
-            height=450,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(255,255,255,0.65)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
-        )
+        sensor_fig.update_traces(line={"width": 2})
+        sensor_fig.update_layout(**_dark_layout(height=460))
+        _dark_axes(sensor_fig, rangeslider=True)
         st.plotly_chart(sensor_fig, use_container_width=True, config=PLOTLY_CONFIG)
 
     with tab_rul:
@@ -536,25 +695,22 @@ def page_engine(
             x=CYCLE_COL,
             y="rul",
             color="series",
-            template="plotly_white",
-            title=f"Actual vs Predicted RUL for Engine {selected_engine}",
-            color_discrete_map={"Actual RUL": "#0b7285", "Predicted RUL": "#d9480f"},
+            template="plotly_dark",
+            title=f"Actual vs Predicted RUL — Engine {selected_engine}",
+            color_discrete_map={"Actual RUL": ACCENT_CYAN, "Predicted RUL": ACCENT_RED},
         )
+        rul_fig.update_traces(line={"width": 2.5})
         rul_fig.add_hline(
             y=failure_threshold,
             line_dash="dash",
-            line_color="#f08c00",
+            line_color=ACCENT_AMBER,
             annotation_text=f"Failure Threshold ({failure_threshold})",
             annotation_position="top left",
+            annotation_font={"color": ACCENT_AMBER},
         )
-        rul_fig.update_layout(
-            height=430,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(255,255,255,0.65)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
-        )
-        rul_fig.update_xaxes(gridcolor="rgba(16, 42, 67, 0.11)")
-        rul_fig.update_yaxes(gridcolor="rgba(16, 42, 67, 0.11)", title="RUL")
+        rul_fig.update_layout(**_dark_layout(height=450))
+        _dark_axes(rul_fig)
+        rul_fig.update_yaxes(title="RUL")
         st.plotly_chart(rul_fig, use_container_width=True, config=PLOTLY_CONFIG)
 
     with tab_explain:
@@ -583,21 +739,19 @@ def page_engine(
             y="feature",
             color="direction",
             orientation="h",
-            template="plotly_white",
-            title="Top SHAP Contributions (Latest Cycle)",
+            template="plotly_dark",
+            title="Top SHAP Contributions — Latest Cycle",
             color_discrete_map={
-                "Increases Predicted RUL": "#2b8a3e",
-                "Decreases Predicted RUL": "#d9480f",
+                "Increases Predicted RUL": ACCENT_GREEN,
+                "Decreases Predicted RUL": ACCENT_RED,
             },
         )
-        shap_bar.update_layout(
-            height=430,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(255,255,255,0.65)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
+        shap_bar.update_layout(**_dark_layout(
+            height=450,
             legend_title_text="Contribution",
-        )
+        ))
         shap_bar.update_xaxes(title="SHAP value impact")
+        _dark_axes(shap_bar)
         st.plotly_chart(shap_bar, use_container_width=True, config=PLOTLY_CONFIG)
 
         st.markdown("### SHAP Waterfall (Latest Reading)")
@@ -624,7 +778,7 @@ def page_performance(metrics: dict, plots_dir: Path, rul_model, feature_cols: li
     col5.metric("Recall", f"{cls['recall']:.3f}")
     col6.metric("F1", f"{cls['f1']:.3f}")
 
-    tab_reg, tab_cls, tab_exp = st.tabs(["Regression", "Classification", "Explainability"])
+    tab_reg, tab_cls, tab_exp = st.tabs(["📊 Regression", "🎯 Classification", "🔍 Explainability"])
 
     with tab_reg:
         baseline = metrics["regression"]["baseline_linear_regression"]
@@ -649,17 +803,17 @@ def page_performance(metrics: dict, plots_dir: Path, rul_model, feature_cols: li
             color="model",
             barmode="group",
             title="Regression Error Comparison",
-            template="plotly_white",
+            template="plotly_dark",
             text="value",
             labels={"value": "Error (Lower is Better)", "metric": "Metric"},
+            color_discrete_map={"LinearRegression": "#475569", "XGBoost": ACCENT_CYAN},
         )
-        reg_compare_fig.update_traces(texttemplate="%{text:.2f}", textposition="outside")
-        reg_compare_fig.update_layout(
-            height=430,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(255,255,255,0.65)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
+        reg_compare_fig.update_traces(
+            texttemplate="%{text:.2f}", textposition="outside",
+            textfont={"color": TEXT_CLR},
         )
+        reg_compare_fig.update_layout(**_dark_layout(height=450))
+        _dark_axes(reg_compare_fig)
         st.plotly_chart(reg_compare_fig, use_container_width=True, config=PLOTLY_CONFIG)
 
     with tab_cls:
@@ -671,20 +825,18 @@ def page_performance(metrics: dict, plots_dir: Path, rul_model, feature_cols: li
                 y=["Actual: No Failure", "Actual: Failure"],
                 text=cm,
                 texttemplate="%{text}",
-                colorscale="Blues",
+                textfont={"color": "#ffffff", "size": 16},
+                colorscale=[[0, "#0f172a"], [0.5, "#164e63"], [1, ACCENT_CYAN]],
                 showscale=False,
             )
         )
-        cm_fig.update_layout(
+        cm_fig.update_layout(**_dark_layout(
             title="Interactive Confusion Matrix",
             xaxis_title="Predicted Label",
             yaxis_title="Actual Label",
-            template="plotly_white",
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(255,255,255,0.65)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
-            height=420,
-        )
+            height=440,
+        ))
+        _dark_axes(cm_fig)
 
         cls_profile = pd.DataFrame(
             {
@@ -698,15 +850,15 @@ def page_performance(metrics: dict, plots_dir: Path, rul_model, feature_cols: li
             theta="metric",
             line_close=True,
             range_r=[0, 1],
-            template="plotly_white",
+            template="plotly_dark",
             title="Classification Metric Profile",
         )
-        radar_fig.update_traces(fill="toself", line_color="#0b7285")
-        radar_fig.update_layout(
-            height=420,
-            paper_bgcolor="rgba(0,0,0,0)",
-            margin={"l": 20, "r": 20, "t": 55, "b": 20},
+        radar_fig.update_traces(
+            fill="toself",
+            line_color=ACCENT_CYAN,
+            fillcolor="rgba(0, 229, 255, 0.12)",
         )
+        radar_fig.update_layout(**_dark_layout(height=440))
 
         cls_col1, cls_col2 = st.columns(2)
         with cls_col1:
@@ -729,15 +881,12 @@ def page_performance(metrics: dict, plots_dir: Path, rul_model, feature_cols: li
                 y="feature",
                 orientation="h",
                 title="Top 10 Model Feature Importances",
-                template="plotly_white",
+                template="plotly_dark",
                 labels={"importance": "Importance", "feature": "Feature"},
+                color_discrete_sequence=[ACCENT_CYAN],
             )
-            importance_fig.update_layout(
-                height=420,
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(255,255,255,0.65)",
-                margin={"l": 20, "r": 20, "t": 55, "b": 20},
-            )
+            importance_fig.update_layout(**_dark_layout(height=440))
+            _dark_axes(importance_fig)
             st.plotly_chart(importance_fig, use_container_width=True, config=PLOTLY_CONFIG)
         else:
             st.info("Model does not expose feature importances for interactive plotting.")
@@ -776,16 +925,19 @@ def main() -> None:
 
     with st.sidebar:
         st.markdown("### Navigation")
-        st.markdown("Select a page to inspect fleet health, engine-level diagnostics, or model quality.")
+        st.markdown(
+            "<span style='color:#94a3b8;font-size:0.88rem'>Inspect fleet health, engine diagnostics, or model quality.</span>",
+            unsafe_allow_html=True,
+        )
         st.divider()
         st.markdown("### Fleet Snapshot")
-        st.metric("High Risk", int((latest_fleet["risk_level"] == "High").sum()))
-        st.metric("Medium Risk", int((latest_fleet["risk_level"] == "Medium").sum()))
-        st.metric("Low Risk", int((latest_fleet["risk_level"] == "Low").sum()))
+        st.metric("🔴 High Risk", int((latest_fleet["risk_level"] == "High").sum()))
+        st.metric("🟡 Medium Risk", int((latest_fleet["risk_level"] == "Medium").sum()))
+        st.metric("🟢 Low Risk", int((latest_fleet["risk_level"] == "Low").sum()))
 
     pages = {
-        "Fleet Overview": lambda: page_fleet(latest_fleet),
-        "Single Engine Deep Dive": lambda: page_engine(
+        "🛰️  Fleet Overview": lambda: page_fleet(latest_fleet),
+        "🔬  Engine Deep Dive": lambda: page_engine(
             latest_fleet=latest_fleet,
             test_df=test_df,
             test_frame=test_frame,
@@ -797,7 +949,7 @@ def main() -> None:
             failure_threshold=metadata["failure_threshold"],
             rul_cap=metadata["rul_cap"],
         ),
-        "Model Performance": lambda: page_performance(
+        "📈  Model Performance": lambda: page_performance(
             metrics=metrics,
             plots_dir=ROOT_DIR / "plots",
             rul_model=rul_model,
@@ -805,7 +957,7 @@ def main() -> None:
         ),
     }
 
-    selected_page = st.sidebar.radio("Pages", list(pages.keys()))
+    selected_page = st.sidebar.radio("Pages", list(pages.keys()), label_visibility="collapsed")
     pages[selected_page]()
 
 
